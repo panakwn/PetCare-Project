@@ -1,3 +1,18 @@
 spring:
   application:
     name: Petcare Project for DS
+
+  datasource:
+    url: jdbc:postgresql://dpg-d4iqmi49c44c73b2kjfg-a.oregon-postgres.render.com:5432/petcaredb_7r4k?sslmode=require
+    username: user
+    password: e94jlmye4LOjUYLsP7gYlJERi3TKShbH
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
