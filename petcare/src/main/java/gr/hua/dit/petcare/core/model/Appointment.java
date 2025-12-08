@@ -15,6 +15,12 @@ public class Appointment {
     @NotNull
     private LocalDateTime date;
 
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
+
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
+
     private String description;
     private String status;
 
@@ -27,14 +33,15 @@ public class Appointment {
     private User vet;
 
     public Appointment() {}
-    
-    
 
-    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public LocalDateTime getDate() { return date; }
     public void setDate(LocalDateTime date) { this.date = date; }
+    public LocalDateTime getStartTime() { return startTime; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+    public LocalDateTime getEndTime() { return endTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     public String getStatus() { return status; }
@@ -43,5 +50,4 @@ public class Appointment {
     public void setPet(Pet pet) { this.pet = pet; }
     public User getVet() { return vet; }
     public void setVet(User vet) { this.vet = vet; }
-
 }
