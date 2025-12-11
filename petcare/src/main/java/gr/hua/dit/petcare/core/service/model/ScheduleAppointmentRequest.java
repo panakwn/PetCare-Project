@@ -3,6 +3,7 @@ package gr.hua.dit.petcare.core.service.model;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+// Data required to create a new appointment
 public record ScheduleAppointmentRequest(
     @NotNull Long petId,
     @NotNull Long vetId,

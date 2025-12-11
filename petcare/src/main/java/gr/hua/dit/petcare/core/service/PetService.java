@@ -4,7 +4,10 @@ import gr.hua.dit.petcare.core.service.model.CreatePetRequest;
 import gr.hua.dit.petcare.core.service.model.PetView; 
 import java.util.List;
 
+// Service interface for Pet related operations
 public interface PetService {
+
+    // Creates a new pet for a specific owner
     PetView createPet(Long ownerId, CreatePetRequest request);
 
     List<PetView> findOwnersPets(Long ownerId);

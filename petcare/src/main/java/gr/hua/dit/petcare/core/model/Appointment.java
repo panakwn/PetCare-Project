@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+// Represents an appointment between a pet and a vet
 @Entity
 @Table(name = "appointments")
 public class Appointment {
