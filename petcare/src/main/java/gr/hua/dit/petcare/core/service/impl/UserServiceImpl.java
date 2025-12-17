@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserView> findAllVets() {
-        return userRepository.findByType(UserType.VETERINARIAN)
+        return userRepository.findByUserType(UserType.VETERINARIAN)
                 .stream()
                 .map(userMapper::toView)
                 .collect(Collectors.toList());
