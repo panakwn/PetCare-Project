@@ -3,11 +3,11 @@ spring:
     name: Petcare Project for DS
 
   datasource:
-    url: jdbc:postgresql://dpg-d4iqmi49c44c73b2kjfg-a.oregon-postgres.render.com:5432/petcaredb_7r4k?sslmode=require
+    url: jdbc:postgresql://dpg-d5cjmqjuibrs739i6oq0-a.oregon-postgres.render.com:5432/dbname_paya?sslmode=require
     username: user
-    password: e94jlmye4LOjUYLsP7gYlJERi3TKShbH
+    password: MLpCiDHEuM7tymMjmVyklNLhgt94ZJN4
     driver-class-name: org.postgresql.Driver
-
+    
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
