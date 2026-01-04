@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PetCare Home</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; padding: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        .welcome-msg { text-align: center; font-size: 1.2em; color: #555; margin-bottom: 30px; }
+
+        /* Grid για τα κουμπιά */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+
+        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; text-align: center; transition: transform 0.2s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: #007bff; }
+        .card h3 { margin-top: 0; color: #007bff; }
+        .card p { color: #666; font-size: 0.9em; }
+
+        .btn-logout { display: block; width: fit-content; margin: 30px auto 0; padding: 10px 20px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px; }
+        .btn-logout:hover { background-color: #c82333; }
+
+        .role-badge { background-color: #e9ecef; padding: 5px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; color: #495057; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>PetCare Dashboard</h1>
+
+    <div class="welcome-msg">
+        <p>Καλώς ήρθες, <strong th:text="${firstName}">User</strong>!</p>
+        <span class="role-badge" th:text="${userType == 'PET_OWNER' ? 'Ιδιοκτήτης' : 'Κτηνίατρος'}">Role</span>
+    </div>
+    <div class="dashboard-grid" th:if="${userType == 'PET_OWNER'}">
+        <a href="/pets" class="card">
+            <h3>Τα Κατοικίδιά μου</h3>
+            <p>Δείτε τη λίστα με τα ζώα σας και το ιστορικό τους.</p>
+        </a>
+        <a href="/pets/new" class="card">
+            <h3>Νέο Κατοικίδιο</h3>
+            <p>Καταχωρήστε ένα νέο ζώο στο σύστημα.</p>
+        </a>
+        <a href="/appointments/new" class="card">
+            <h3>Κλείσε Ραντεβού</h3>
+            <p>Προγραμματίστε επίσκεψη στον κτηνίατρο.</p>
+        </a>
+    </div>
+
+    <div class="dashboard-grid" th:if="${userType == 'VETERINARIAN'}">
+        <a href="/vet/appointments" class="card">
+            <h3>Προσεχή Ραντεβού</h3>
+            <p>Δείτε το πρόγραμμα των επισκέψεων σας.</p>
+        </a>
+        <a href="/vet/patients" class="card">
+            <h3>Ασθενείς (Ζώα)</h3>
+            <p>Αναζήτηση ιστορικού για τα κατοικίδια.</p>
+        </a>
+        <a href="/profile" class="card">
+            <h3>Το Προφίλ μου</h3>
+            <p>Διαχείριση στοιχείων και ωραρίου.</p>
+        </a>
+    </div>
+
+    <form th:action="@{/logout}" method="post" style="text-align: center;">
+        <button type="submit" class="btn-logout">Αποσύνδεση</button>
+    </form>
+</div>
+
+</body>
+</html>
