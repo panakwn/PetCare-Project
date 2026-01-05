@@ -1,8 +1,9 @@
 package gr.hua.dit.petcare.core.service;
 
+import java.util.List;
+
 import gr.hua.dit.petcare.core.service.model.CreateUserRequest;
 import gr.hua.dit.petcare.core.service.model.UserView;
-import java.util.List;
 
 // Service interface for User related operations
 public interface UserService {
