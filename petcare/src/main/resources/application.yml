@@ -15,4 +15,8 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format_sql: truε
+
+app:
+  external-services:
+    email-url: "https://jsonplaceholder.typicode.com/posts"
