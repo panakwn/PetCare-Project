@@ -1,8 +1,5 @@
 package gr.hua.dit.petcare.core.service.impl;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import gr.hua.dit.petcare.core.model.Appointment;
 import gr.hua.dit.petcare.core.model.Pet;
 import gr.hua.dit.petcare.core.model.User;
@@ -12,17 +9,20 @@ import gr.hua.dit.petcare.core.repository.PetRepository;
 import gr.hua.dit.petcare.core.repository.UserRepository;
 import gr.hua.dit.petcare.core.service.AppointmentBusinessLogicService;
 import gr.hua.dit.petcare.core.service.model.ScheduleAppointmentRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
 public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessLogicService {
 
     private final AppointmentRepository appointmentRepository;
-    private final PetRepository petRepository;   // Χρειαζόμαστε το PetRepository
-    private final UserRepository userRepository; // Χρειαζόμαστε το UserRepository για τον Κτηνίατρο
+    private final PetRepository petRepository;
+    private final UserRepository userRepository;
     private final EmailNotificationPort emailPort;
 
-    // Constructor Injection
     public AppointmentBusinessLogicServiceImpl(AppointmentRepository appointmentRepository,
                                                PetRepository petRepository,
                                                UserRepository userRepository,
@@ -36,7 +36,6 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
     @Override
     public String scheduleAppointment(ScheduleAppointmentRequest request) {
         // 1. Βρίσκουμε το κατοικίδιο (Pet)
-        // Στα records δεν χρησιμοποιούμε getPetId(), αλλά petId()
         Pet pet = petRepository.findById(request.petId())
                 .orElseThrow(() -> new RuntimeException("Pet not found with id: " + request.petId()));
 
@@ -50,21 +49,38 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
         User vet = userRepository.findById(request.vetId())
                 .orElseThrow(() -> new RuntimeException("Vet not found with id: " + request.vetId()));
 
-        // --- ΕΔΩ ΘΑ ΜΠΟΡΟΥΣΕΣ ΝΑ ΒΑΛΕΙΣ ΕΛΕΓΧΟΥΣ ΓΙΑ ΔΙΠΛΑ ΡΑΝΤΕΒΟΥ ---
-        // π.χ. if (appointmentRepository.existsByVetAndDate(...)) { ... }
+        // --- ΕΛΕΓΧΟΣ: Ελάχιστος χρόνος 2 ημερών ανάμεσα στα ραντεβού του ίδιου ζώου ---
+        LocalDateTime requestedDate = request.date();
+        // Ορίζουμε το διάστημα: 2 μέρες ΠΡΙΝ και 2 μέρες ΜΕΤΑ την αιτούμενη ημερομηνία
+        LocalDateTime startBound = requestedDate.minusDays(2);
+        LocalDateTime endBound = requestedDate.plusDays(2);
+
+        boolean conflictExists = appointmentRepository.existsByPetIdAndDateBetween(
+                pet.getId(),
+                startBound,
+                endBound
+        );
+
+        if (conflictExists) {
+            throw new RuntimeException("Δεν επιτρέπεται νέο ραντεβού. Πρέπει να υπάρχει κενό 2 ημερών από προηγούμενο ή επόμενο ραντεβού για το ίδιο κατοικίδιο.");
+        }
+        // -------------------------------------------------------------------------------
 
         // 4. Δημιουργία και αποθήκευση του ραντεβού
         Appointment appointment = new Appointment();
-        appointment.setPet(pet);  // Συνδέουμε το Pet
-        appointment.setVet(vet);  // Συνδέουμε τον Vet
-        appointment.setDate(request.date()); // Ημερομηνία από το record
-        appointment.setDescription(request.description()); // Περιγραφή
+        appointment.setPet(pet);
+        appointment.setVet(vet);
+        appointment.setDate(request.date());
+        appointment.setDescription(request.description());
         appointment.setStatus("SCHEDULED"); // Αρχική κατάσταση
+
+        // Υπολογισμός ώρας λήξης (π.χ. 30 λεπτά διάρκεια) για μελλοντική χρήση
+        appointment.setStartTime(request.date());
+        appointment.setEndTime(request.date().plusMinutes(30));
 
         appointmentRepository.save(appointment);
 
         // 5. Αποστολή Email στον ιδιοκτήτη
-        // Διόρθωση: getFirstName() αντί για getFirstname()
         emailPort.sendEmail(
                 owner.getEmail(),
                 "Επιβεβαίωση Ραντεβού",
