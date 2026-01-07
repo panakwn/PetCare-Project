@@ -38,30 +38,28 @@ public class AppointmentController {
         model.addAttribute("appointments", appointmentRepository.findAll());
         return "appointments";
     }
-
     @GetMapping("/new")
     public String showScheduleForm(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        User currentUser = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found: " + userDetails.getUsername()));
 
         model.addAttribute("pets", currentUser.getPets());
-
         model.addAttribute("vets", userRepository.findByUserType(UserType.VETERINARIAN));
+
+        model.addAttribute("scheduleAppointmentRequest", new ScheduleAppointmentRequest(null, null, null, null));
 
         return "appointment_new";
     }
 
     @PostMapping("/new")
-    public String scheduleAppointment(@Valid @ModelAttribute ScheduleAppointmentRequest request,
+    public String scheduleAppointment(@Valid @ModelAttribute("scheduleAppointmentRequest") ScheduleAppointmentRequest request,
                                       BindingResult bindingResult,
                                       Model model,
                                       @AuthenticationPrincipal UserDetails userDetails) {
         if (bindingResult.hasErrors()) {
-            User currentUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+            User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
             model.addAttribute("pets", currentUser.getPets());
-
             model.addAttribute("vets", userRepository.findByUserType(UserType.VETERINARIAN));
-
             return "appointment_new";
         }
 

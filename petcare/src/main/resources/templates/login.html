@@ -1,48 +1,49 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
 <head>
-    <meta charset="UTF-8">
-    <title>PetCare Login</title>
-    <style>
-        body { font-family: sans-serif; padding: 2rem; max-width: 500px; margin: 0 auto; }
-        .alert-error { color: #721c24; background-color: #f8d7da; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
-        .alert-success { color: #155724; background-color: #d4edda; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-    </style>
+    <title>Σύνδεση</title>
 </head>
 <body>
 
-<h2>PetCare Login</h2>
+<div layout:fragment="content">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <h3>Είσοδος</h3>
+                </div>
+                <div class="card-body">
+                    <div th:if="${param.error}" class="alert alert-danger">
+                        Λάθος όνομα χρήστη ή κωδικός πρόσβασης.
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success">
+                        Αποσυνδεθήκατε επιτυχώς.
+                    </div>
 
-<div th:if="${param.error}" class="alert-error">
-    Wrong username or password
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required autofocus>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Σύνδεση</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <small>Δεν έχετε λογαριασμό; <a th:href="@{/register}">Εγγραφείτε εδώ</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div th:if="${param.logout}" class="alert-success">
-    Logged out
-</div>
-
-<form th:action="@{/login}" method="post">
-    <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" required autofocus/>
-    </div>
-
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required/>
-    </div>
-
-    <div class="form-group">
-        <button type="submit">Sign in</button>
-    </div>
-</form>
-
-<p>New here? <a th:href="@{/register}">Join us!</a>.</p>
 
 </body>
 </html>
