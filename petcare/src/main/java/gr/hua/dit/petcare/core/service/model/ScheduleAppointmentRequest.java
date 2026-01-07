@@ -16,26 +16,22 @@ public class ScheduleAppointmentRequest {
     private Long vetId;
 
     @NotNull(message = "Η ημερομηνία είναι υποχρεωτική")
-    @Future(message = "Το ραντεβού πρέπει να είναι σε μελλοντική ημερομηνία") // Προαιρετικός έλεγχος
+    @Future(message = "Το ραντεβού πρέπει να είναι σε μελλοντική ημερομηνία")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime date;
 
     @Size(max = 255, message = "Η περιγραφή δεν μπορεί να ξεπερνά τους 255 χαρακτήρες")
     private String description;
 
-    // Κενός Constructor (Απαραίτητος για τη φόρμα)
     public ScheduleAppointmentRequest() {
     }
 
-    // Constructor με ορίσματα (για ευκολία αν χρειαστεί αλλού)
     public ScheduleAppointmentRequest(Long petId, Long vetId, LocalDateTime date, String description) {
         this.petId = petId;
         this.vetId = vetId;
         this.date = date;
         this.description = description;
     }
-
-    // --- Getters & Setters (Απαραίτητα για το Thymeleaf) ---
 
     public Long getPetId() {
         return petId;

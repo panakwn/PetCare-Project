@@ -7,7 +7,6 @@
   <title>Κλείσιμο Ραντεβού</title>
 </head>
 <body>
-
 <div layout:fragment="content">
   <div class="row justify-content-center">
     <div class="col-md-6">
@@ -21,10 +20,9 @@
 
             <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger">
               <ul>
-                <li th:each="err : ${#fields.allErrors()}" th:text="${err}"></li>
+                <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
               </ul>
             </div>
-
             <div class="mb-3">
               <label for="petId" class="form-label">Επιλέξτε Κατοικίδιο</label>
               <select class="form-select" id="petId" th:field="*{petId}" required>
@@ -34,6 +32,7 @@
                         th:text="${pet.name}"></option>
               </select>
             </div>
+
             <div class="mb-3">
               <label for="vetId" class="form-label">Επιλέξτε Κτηνίατρο</label>
               <select class="form-select" id="vetId" th:field="*{vetId}" required>
@@ -48,7 +47,6 @@
               <label for="date" class="form-label">Ημερομηνία & Ώρα</label>
               <input type="datetime-local" class="form-control" id="date" th:field="*{date}" required>
             </div>
-
             <div class="mb-3">
               <label for="description" class="form-label">Αιτία Επίσκεψης</label>
               <textarea class="form-control" id="description" th:field="*{description}" rows="3" placeholder="π.χ. Ετήσιος εμβολιασμός"></textarea>
