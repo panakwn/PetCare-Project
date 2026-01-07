@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,19 +35,29 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public String listAppointments(Model model) {
-        model.addAttribute("appointments", appointmentRepository.findAll());
+    public String listAppointments(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentUser.getUserType() == UserType.VETERINARIAN) {
+            model.addAttribute("appointments", appointmentRepository.findAllByVetId(currentUser.getId()));
+        } else {
+            model.addAttribute("appointments", appointmentRepository.findAllByOwnerId(currentUser.getId()));
+        }
+
         return "appointments";
     }
+
     @GetMapping("/new")
     public String showScheduleForm(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found: " + userDetails.getUsername()));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         model.addAttribute("pets", currentUser.getPets());
         model.addAttribute("vets", userRepository.findByUserType(UserType.VETERINARIAN));
 
-        model.addAttribute("scheduleAppointmentRequest", new ScheduleAppointmentRequest(null, null, null, null));
+        // --- ΑΛΛΑΓΗ ΕΔΩ: Χρήση του κενού constructor ---
+        model.addAttribute("scheduleAppointmentRequest", new ScheduleAppointmentRequest());
 
         return "appointment_new";
     }
@@ -56,14 +67,26 @@ public class AppointmentController {
                                       BindingResult bindingResult,
                                       Model model,
                                       @AuthenticationPrincipal UserDetails userDetails) {
+
+        User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+
         if (bindingResult.hasErrors()) {
-            User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
             model.addAttribute("pets", currentUser.getPets());
             model.addAttribute("vets", userRepository.findByUserType(UserType.VETERINARIAN));
             return "appointment_new";
         }
 
-        appointmentService.scheduleAppointment(request);
+        try {
+            appointmentService.scheduleAppointment(request);
+        } catch (RuntimeException e) {
+            bindingResult.addError(new ObjectError("scheduleAppointmentRequest", e.getMessage()));
+
+            model.addAttribute("pets", currentUser.getPets());
+            model.addAttribute("vets", userRepository.findByUserType(UserType.VETERINARIAN));
+
+            return "appointment_new";
+        }
+
         return "redirect:/appointments";
     }
 }

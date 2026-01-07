@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title>My Pets</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🐶 My Pets</h2>
+        <a th:href="@{/pets/new}" class="btn btn-warning">
+            <i class="bi bi-plus-lg"></i> Add New
+        </a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" th:each="pet : ${pets}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header text-center bg-light">
+                    <h1 th:if="${pet.species == 'DOG'}">🐕</h1>
+                    <h1 th:if="${pet.species == 'CAT'}">🐈</h1>
+                    <h1 th:if="${pet.species != 'DOG' and pet.species != 'CAT'}">🐾</h1>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-center" th:text="${pet.name}">Max</h5>
+                    <p class="card-text text-muted text-center" th:text="${pet.breed}">Labrador</p>
+                    <hr>
+                    <ul class="list-unstyled">
+                        <li>
+                            <strong>Age:</strong>
+                            <span th:text="${pet.age} + ' years'">2 years</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(pets)}" class="alert alert-info text-center">
+        You haven't added any pets yet.
+        <a th:href="@{/pets/new}">Add your first one!</a>
+    </div>
+</div>
+
+</body>
+</html>

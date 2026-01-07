@@ -35,9 +35,9 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
 
     @Override
     public String scheduleAppointment(ScheduleAppointmentRequest request) {
-        // 1. Βρίσκουμε το κατοικίδιο (Pet)
-        Pet pet = petRepository.findById(request.petId())
-                .orElseThrow(() -> new RuntimeException("Pet not found with id: " + request.petId()));
+        // 1. Βρίσκουμε το κατοικίδιο (Pet) - Χρήση GETTER
+        Pet pet = petRepository.findById(request.getPetId())
+                .orElseThrow(() -> new RuntimeException("Pet not found with id: " + request.getPetId()));
 
         // 2. Βρίσκουμε τον ιδιοκτήτη (User) μέσα από το κατοικίδιο
         User owner = pet.getOwner();
@@ -45,12 +45,13 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
             throw new RuntimeException("Owner not found for this pet");
         }
 
-        // 3. Βρίσκουμε τον κτηνίατρο (Vet)
-        User vet = userRepository.findById(request.vetId())
-                .orElseThrow(() -> new RuntimeException("Vet not found with id: " + request.vetId()));
+        // 3. Βρίσκουμε τον κτηνίατρο (Vet) - Χρήση GETTER
+        User vet = userRepository.findById(request.getVetId())
+                .orElseThrow(() -> new RuntimeException("Vet not found with id: " + request.getVetId()));
 
         // --- ΕΛΕΓΧΟΣ: Ελάχιστος χρόνος 2 ημερών ανάμεσα στα ραντεβού του ίδιου ζώου ---
-        LocalDateTime requestedDate = request.date();
+        LocalDateTime requestedDate = request.getDate(); // Χρήση GETTER
+
         // Ορίζουμε το διάστημα: 2 μέρες ΠΡΙΝ και 2 μέρες ΜΕΤΑ την αιτούμενη ημερομηνία
         LocalDateTime startBound = requestedDate.minusDays(2);
         LocalDateTime endBound = requestedDate.plusDays(2);
@@ -70,13 +71,13 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
         Appointment appointment = new Appointment();
         appointment.setPet(pet);
         appointment.setVet(vet);
-        appointment.setDate(request.date());
-        appointment.setDescription(request.description());
+        appointment.setDate(request.getDate()); // Χρήση GETTER
+        appointment.setDescription(request.getDescription()); // Χρήση GETTER
         appointment.setStatus("SCHEDULED"); // Αρχική κατάσταση
 
-        // Υπολογισμός ώρας λήξης (π.χ. 30 λεπτά διάρκεια) για μελλοντική χρήση
-        appointment.setStartTime(request.date());
-        appointment.setEndTime(request.date().plusMinutes(30));
+        // Υπολογισμός ώρας λήξης (π.χ. 30 λεπτά διάρκεια)
+        appointment.setStartTime(request.getDate()); // Χρήση GETTER
+        appointment.setEndTime(request.getDate().plusMinutes(30)); // Χρήση GETTER
 
         appointmentRepository.save(appointment);
 
