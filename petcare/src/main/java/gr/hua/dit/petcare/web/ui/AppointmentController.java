@@ -1,5 +1,12 @@
 package gr.hua.dit.petcare.web.ui;
 
+import gr.hua.dit.petcare.core.model.User;
+import gr.hua.dit.petcare.core.model.UserType;
+import gr.hua.dit.petcare.core.repository.AppointmentRepository;
+import gr.hua.dit.petcare.core.repository.UserRepository;
+import gr.hua.dit.petcare.core.service.AppointmentBusinessLogicService;
+import gr.hua.dit.petcare.core.service.model.ScheduleAppointmentRequest;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -10,14 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import gr.hua.dit.petcare.core.model.User;
-import gr.hua.dit.petcare.core.model.UserType;
-import gr.hua.dit.petcare.core.repository.AppointmentRepository;
-import gr.hua.dit.petcare.core.repository.UserRepository;
-import gr.hua.dit.petcare.core.service.AppointmentBusinessLogicService;
-import gr.hua.dit.petcare.core.service.model.ScheduleAppointmentRequest;
-import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/appointments")
@@ -43,7 +42,8 @@ public class AppointmentController {
         if (currentUser.getUserType() == UserType.VETERINARIAN) {
             model.addAttribute("appointments", appointmentRepository.findAllByVetId(currentUser.getId()));
         } else {
-            model.addAttribute("appointments", appointmentRepository.findAllByOwnerId(currentUser.getId()));
+            // --- ΔΙΟΡΘΩΣΗ ΕΔΩ: Κλήση της νέας μεθόδου ---
+            model.addAttribute("appointments", appointmentRepository.findAllByPetOwnerId(currentUser.getId()));
         }
 
         return "appointments";
@@ -56,8 +56,6 @@ public class AppointmentController {
 
         model.addAttribute("pets", currentUser.getPets());
         model.addAttribute("vets", userRepository.findByUserType(UserType.VETERINARIAN));
-
-        // --- ΑΛΛΑΓΗ ΕΔΩ: Χρήση του κενού constructor ---
         model.addAttribute("scheduleAppointmentRequest", new ScheduleAppointmentRequest());
 
         return "appointment_new";
@@ -69,6 +67,7 @@ public class AppointmentController {
                                       Model model,
                                       @AuthenticationPrincipal UserDetails userDetails) {
 
+        // Θυμήσου: Εδώ είχαμε βάλει το findByUsernameWithPets για το LazyInitializationException
         User currentUser = userRepository.findByUsernameWithPets(userDetails.getUsername()).orElseThrow();
 
         if (bindingResult.hasErrors()) {
