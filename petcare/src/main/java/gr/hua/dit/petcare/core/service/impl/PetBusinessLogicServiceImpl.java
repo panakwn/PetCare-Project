@@ -2,10 +2,8 @@ package gr.hua.dit.petcare.core.service.impl;
 
 import java.time.LocalDate;
 import java.time.Period;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import gr.hua.dit.petcare.core.model.Pet;
 import gr.hua.dit.petcare.core.model.User;
 import gr.hua.dit.petcare.core.repository.PetRepository;
@@ -31,13 +29,10 @@ public class PetBusinessLogicServiceImpl implements PetBusinessLogicService {
                 .orElseThrow(() -> new RuntimeException("User not found: " + ownerUsername));
 
         Pet pet = new Pet();
-        
         pet.setName(request.name());
-        
         pet.setSpecies(request.animalType());
-        
         pet.setBreed(request.breed());
-        
+
         if (request.birthDate() != null) {
             int calculatedAge = Period.between(request.birthDate(), LocalDate.now()).getYears();
             pet.setAge(calculatedAge);
@@ -46,7 +41,27 @@ public class PetBusinessLogicServiceImpl implements PetBusinessLogicService {
         }
 
         pet.setOwner(owner);
+        petRepository.save(pet);
+    }
 
+    @Override
+    public void deletePet(Long petId, String username) {
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new RuntimeException("Pet not found with id: " + petId));
+
+        if (!pet.getOwner().getUsername().equals(username)) {
+            throw new RuntimeException("Δεν έχετε δικαίωμα να διαγράψετε αυτό το κατοικίδιο!");
+        }
+
+        petRepository.delete(pet);
+    }
+
+    @Override
+    public void updateVetNotes(Long petId, String notes) {
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new RuntimeException("Pet not found with id: " + petId));
+
+        pet.setVetNotes(notes);
         petRepository.save(pet);
     }
 }

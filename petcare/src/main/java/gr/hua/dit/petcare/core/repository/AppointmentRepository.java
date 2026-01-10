@@ -1,32 +1,42 @@
 package gr.hua.dit.petcare.core.repository;
 
-import gr.hua.dit.petcare.core.model.Appointment;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+
+import gr.hua.dit.petcare.core.model.Appointment;
+
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-    // Βρίσκει τα ραντεβού με βάση το ID του κτηνιάτρου (vet.id)
-    List<Appointment> findAllByVetId(Long vetId);
 
-    // --- ΔΙΟΡΘΩΣΗ ΕΔΩ ---
-    // Αλλαγή από findAllByOwnerId σε findAllByPetOwnerId
-    // Βρίσκει τα ραντεβού με βάση το ID του ιδιοκτήτη του κατοικιδίου (pet.owner.id)
-    List<Appointment> findAllByPetOwnerId(Long ownerId);
-    // --------------------
+    // --- ΤΑ ΠΑΛΙΑ (κρατάμε μόνο τα active/pending) ---
+
+    // Για τον Κτηνίατρο: Φέρε αυτά που (Τελειώνουν στο μέλλον) Ή (Είναι ακόμη SCHEDULED)
+    @Query("SELECT a FROM Appointment a WHERE a.vet.id = :vetId AND (a.endTime > :now OR a.status = 'SCHEDULED') ORDER BY a.startTime ASC")
+    List<Appointment> findActiveByVetId(@Param("vetId") Long vetId, @Param("now") LocalDateTime now);
+
+
+    // Για τον Ιδιοκτήτη: Φέρε αυτά που (Τελειώνουν στο μέλλον) Ή (Είναι ακόμη SCHEDULED)
+    @Query("SELECT a FROM Appointment a WHERE a.pet.owner.id = :ownerId AND (a.endTime > :now OR a.status = 'SCHEDULED') ORDER BY a.startTime ASC")
+    List<Appointment> findActiveByPetOwnerId(@Param("ownerId") Long ownerId, @Param("now") LocalDateTime now);
+
+
+    // ... οι υπόλοιπες μέθοδοι που είχαμε (existsOverlappingAppointment κλπ) ...
+    List<Appointment> findAllByVetId(Long vetId);
+    List<Appointment> findAllByPetOwnerId(Long ownerId); // Ήταν findAllByPetOwnerId που φτιάξαμε πριν
 
     boolean existsByPetIdAndDateBetween(Long petId, LocalDateTime start, LocalDateTime end);
 
-    @Query("SELECT COUNT(a) > 0 FROM Appointment a " +
-            "WHERE a.vet.id = :vetId " +
-            "AND (a.startTime < :endTime AND a.endTime > :startTime)")
-    boolean existsOverlappingAppointment(@Param("vetId") Long vetId,
-                                         @Param("startTime") LocalDateTime startTime,
-                                         @Param("endTime") LocalDateTime endTime);
+
+    @Query("SELECT COUNT(a) > 0 FROM Appointment a WHERE a.vet.id = :vetId AND a.startTime IS NOT NULL AND a.endTime IS NOT NULL AND (a.startTime < :endTime AND a.endTime > :startTime)")
+    boolean existsOverlappingAppointment(@Param("vetId") Long vetId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 }

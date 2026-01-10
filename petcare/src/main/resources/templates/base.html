@@ -34,9 +34,6 @@
                 <li class="nav-item" sec:authorize="hasRole('PET_OWNER')">
                     <a class="nav-link" th:href="@{/pets}">My Pets</a>
                 </li>
-                <li class="nav-item" sec:authorize="hasRole('VETERINARIAN')">
-                    <a class="nav-link text-warning" href="#">Πρόγραμμα Ιατρείου</a>
-                </li>
             </ul>
 
             <ul class="navbar-nav ms-auto">

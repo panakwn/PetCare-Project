@@ -5,24 +5,95 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{base}">
 <head>
-    <title>PetCare - Αρχική</title>
+    <title>PetCare Home</title>
 </head>
 <body>
 
 <div layout:fragment="content">
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold">Καλώς ήρθατε στο PetCare</h1>
-            <p class="col-md-8 fs-4">Η ολοκληρωμένη πλατφόρμα φροντίδας για τους αγαπημένους σας φίλους. Κλείστε ραντεβού με κτηνίατρο εύκολα και γρήγορα.</p>
+    <div sec:authorize="!hasRole('VETERINARIAN')">
+        <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">Καλώς ήρθατε στο PetCare</h1>
+                <p class="col-md-8 fs-4">
+                    Η ολοκληρωμένη πλατφόρμα φροντίδας για τους αγαπημένους σας φίλους.
+                    Κλείστε ραντεβού με κτηνίατρο εύκολα και γρήγορα.
+                    Διαχειριστείτε το ιστορικό και την υγεία των κατοικιδίων σας.
+                </p>
+                <div class="mt-4">
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/register}" class="btn btn-primary btn-lg me-2">Εγγραφή</a>
+                        <a th:href="@{/login}" class="btn btn-outline-secondary btn-lg">Σύνδεση</a>
+                    </div>
 
-            <div sec:authorize="isAnonymous()">
-                <a th:href="@{/login}" class="btn btn-primary btn-lg" type="button">Σύνδεση</a>
-                <a th:href="@{/register}" class="btn btn-outline-secondary btn-lg" type="button">Εγγραφή</a>
+                    <div sec:authorize="hasRole('OWNER')">
+                        <a th:href="@{/appointments/new}" class="btn btn-success btn-lg">
+                            <i class="bi bi-calendar-plus"></i> Κλείστε Ραντεβού Τώρα
+                        </a>
+                        <a th:href="@{/pets}" class="btn btn-outline-dark btn-lg ms-2">
+                            <i class="bi bi-github"></i> Τα Κατοικίδιά μου
+                        </a>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <div sec:authorize="isAuthenticated()">
-                <p class="mt-3">Γεια σας, <span sec:authentication="name" class="fw-bold">User</span>!</p>
-                <a th:href="@{/appointments/new}" class="btn btn-success btn-lg">Κλείστε Ραντεβού Τώρα</a>
+        <div class="row align-items-md-stretch">
+            <div class="col-md-6">
+                <div class="h-100 p-5 text-white bg-dark rounded-3">
+                    <h2>Φροντίδα & Υγεία</h2>
+                    <p>Κρατήστε οργανωμένο το ιατρικό ιστορικό του ζώου σας και δείτε τις οδηγίες του κτηνιάτρου σας online.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="h-100 p-5 bg-light border rounded-3">
+                    <h2>Εύκολη Πρόσβαση</h2>
+                    <p>Βρείτε διαθέσιμους κτηνιάτρους και κλείστε ραντεβού με μερικά κλικ, 24 ώρες το 24ωρο.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div sec:authorize="hasRole('VETERINARIAN')">
+        <div class="p-5 mb-4 bg-info bg-opacity-10 rounded-3 border border-info shadow-sm">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold text-dark">
+                    <i class="bi bi-activity"></i> Κέντρο Διαχείρισης Ιατρείου
+                </h1>
+                <p class="col-md-8 fs-4 text-muted">
+                    Καλώς ήρθατε, Γιατρέ. Εδώ μπορείτε να διαχειριστείτε το πρόγραμμά σας,
+                    να δείτε τα επερχόμενα ραντεβού και να ενημερώσετε τους φακέλους των ασθενών σας.
+                </p>
+                <div class="mt-4">
+                    <a th:href="@{/appointments}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-calendar-check"></i> Προβολή Προγράμματος
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row align-items-md-stretch">
+            <div class="col-md-4">
+                <div class="h-100 p-4 bg-white border rounded-3 shadow-sm text-center">
+                    <i class="bi bi-list-task display-4 text-primary mb-3"></i>
+                    <h3>Διαχείριση Ραντεβού</h3>
+                    <p>Δείτε τη λίστα των ραντεβού σας, ολοκληρώστε επισκέψεις και δείτε το ιστορικό.</p>
+                    <a th:href="@{/appointments}" class="btn btn-outline-primary">Μετάβαση</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="h-100 p-4 bg-white border rounded-3 shadow-sm text-center">
+                    <i class="bi bi-journal-medical display-4 text-success mb-3"></i>
+                    <h3>Σημειώσεις Ασθενών</h3>
+                    <p>Προσθέστε ιατρικές σημειώσεις και οδηγίες στα προφίλ των κατοικιδίων.</p>
+                    <small class="text-muted">(Μέσω της λίστας ραντεβού)</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="h-100 p-4 bg-white border rounded-3 shadow-sm text-center">
+                    <i class="bi bi-clock-history display-4 text-warning mb-3"></i>
+                    <h3>Ιστορικό</h3>
+                    <p>Δείτε προηγούμενα ραντεβού και διαχειριστείτε την εξέλιξη των θεραπειών.</p>
+                </div>
             </div>
         </div>
     </div>

@@ -10,7 +10,7 @@
 
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>🐶 My Pets</h2>
+        <h2>🐾 My Pets</h2>
         <a th:href="@{/pets/new}" class="btn btn-warning">
             <i class="bi bi-plus-lg"></i> Add New
         </a>
@@ -33,7 +33,22 @@
                             <strong>Age:</strong>
                             <span th:text="${pet.age} + ' years'">2 years</span>
                         </li>
+
+                        <li class="mt-3" th:if="${pet.vetNotes != null and pet.vetNotes != ''}">
+                            <div class="alert alert-warning py-2">
+                                <strong><i class="bi bi-journal-medical"></i> Σημειώσεις Κτηνιάτρου:</strong><br>
+                                <small th:text="${pet.vetNotes}"></small>
+                            </div>
+                        </li>
                     </ul>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 d-flex justify-content-center pb-3">
+                    <form th:action="@{/pets/delete/{id}(id=${pet.id})}" method="post"
+                          onsubmit="return confirm('Είστε σίγουροι; Θα διαγραφούν και όλα τα ραντεβού του κατοικιδίου.');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

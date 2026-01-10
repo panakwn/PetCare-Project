@@ -11,7 +11,6 @@ import gr.hua.dit.petcare.core.service.AppointmentBusinessLogicService;
 import gr.hua.dit.petcare.core.service.model.ScheduleAppointmentRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 
 @Service
@@ -19,69 +18,69 @@ import java.time.LocalDateTime;
 public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessLogicService {
 
     private final AppointmentRepository appointmentRepository;
-    private final PetRepository petRepository;
     private final UserRepository userRepository;
+    private final PetRepository petRepository;
     private final EmailNotificationPort emailPort;
 
     public AppointmentBusinessLogicServiceImpl(AppointmentRepository appointmentRepository,
-                                               PetRepository petRepository,
                                                UserRepository userRepository,
+                                               PetRepository petRepository,
                                                EmailNotificationPort emailPort) {
         this.appointmentRepository = appointmentRepository;
-        this.petRepository = petRepository;
         this.userRepository = userRepository;
+        this.petRepository = petRepository;
         this.emailPort = emailPort;
     }
 
     @Override
     public String scheduleAppointment(ScheduleAppointmentRequest request) {
-        // 1. Βρίσκουμε το κατοικίδιο (Pet) - Χρήση GETTER
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new RuntimeException("Pet not found with id: " + request.getPetId()));
 
-        // 2. Βρίσκουμε τον ιδιοκτήτη (User) μέσα από το κατοικίδιο
         User owner = pet.getOwner();
         if (owner == null) {
             throw new RuntimeException("Owner not found for this pet");
         }
 
-        // 3. Βρίσκουμε τον κτηνίατρο (Vet) - Χρήση GETTER
         User vet = userRepository.findById(request.getVetId())
                 .orElseThrow(() -> new RuntimeException("Vet not found with id: " + request.getVetId()));
 
-        // --- ΕΛΕΓΧΟΣ: Ελάχιστος χρόνος 2 ημερών ανάμεσα στα ραντεβού του ίδιου ζώου ---
-        LocalDateTime requestedDate = request.getDate(); // Χρήση GETTER
-
-        // Ορίζουμε το διάστημα: 2 μέρες ΠΡΙΝ και 2 μέρες ΜΕΤΑ την αιτούμενη ημερομηνία
+        LocalDateTime requestedDate = request.getDate();
         LocalDateTime startBound = requestedDate.minusDays(2);
         LocalDateTime endBound = requestedDate.plusDays(2);
 
         boolean conflictExists = appointmentRepository.existsByPetIdAndDateBetween(
-                pet.getId(),
-                startBound,
-                endBound
+                pet.getId(), startBound, endBound
         );
 
         if (conflictExists) {
             throw new RuntimeException("Δεν επιτρέπεται νέο ραντεβού. Πρέπει να υπάρχει κενό 2 ημερών από προηγούμενο ή επόμενο ραντεβού για το ίδιο κατοικίδιο.");
         }
-        // -------------------------------------------------------------------------------
 
-        // 4. Δημιουργία και αποθήκευση του ραντεβού
+        LocalDateTime newAppointmentStart = request.getDate();
+        LocalDateTime newAppointmentEnd = newAppointmentStart.plusMinutes(30);
+
+        boolean isVetBusy = appointmentRepository.existsOverlappingAppointment(
+                vet.getId(),
+                newAppointmentStart,
+                newAppointmentEnd
+        );
+
+        if (isVetBusy) {
+            throw new RuntimeException("Ο κτηνίατρος δεν είναι διαθέσιμος την επιλεγμένη ώρα (" + newAppointmentStart + " - " + newAppointmentEnd + "). Παρακαλώ επιλέξτε άλλη ώρα.");
+        }
+
         Appointment appointment = new Appointment();
         appointment.setPet(pet);
         appointment.setVet(vet);
-        appointment.setDate(request.getDate()); // Χρήση GETTER
-        appointment.setDescription(request.getDescription()); // Χρήση GETTER
-        appointment.setStatus("SCHEDULED"); // Αρχική κατάσταση
-
-        // Υπολογισμός ώρας λήξης (π.χ. 30 λεπτά διάρκεια)
-        appointment.setStartTime(request.getDate()); // Χρήση GETTER
-        appointment.setEndTime(request.getDate().plusMinutes(30)); // Χρήση GETTER
+        appointment.setDate(requestedDate);
+        appointment.setDescription(request.getDescription());
+        appointment.setStatus("SCHEDULED");
+        appointment.setStartTime(newAppointmentStart);
+        appointment.setEndTime(newAppointmentEnd);
 
         appointmentRepository.save(appointment);
 
-        // 5. Αποστολή Email στον ιδιοκτήτη
         emailPort.sendEmail(
                 owner.getEmail(),
                 "Επιβεβαίωση Ραντεβού",
@@ -89,5 +88,23 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
         );
 
         return "Appointment created successfully with ID: " + appointment.getId();
+    }
+
+    @Override
+    public void completeAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        appointment.setStatus("COMPLETED");
+        appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public void cancelAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        appointment.setStatus("CANCELLED");
+        appointmentRepository.save(appointment);
     }
 }

@@ -1,13 +1,13 @@
 package gr.hua.dit.petcare.core.security;
 
-import gr.hua.dit.petcare.core.model.User;
+import java.util.Collection;
+import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.util.Collection;
-import java.util.Collections;
+import gr.hua.dit.petcare.core.model.User;
 
-public class ApplicationUserDetails implements UserDetails{
+public class ApplicationUserDetails implements UserDetails {
 
     private final User user;
 
@@ -17,6 +17,22 @@ public class ApplicationUserDetails implements UserDetails{
 
     public User getUser() {
         return user;
+    }
+
+    public String getFirstName() {
+        return user.getFirstName();
+    }
+
+    public String getLastName() {
+        return user.getLastName();
+    }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    public Long getId() {
+        return user.getId();
     }
 
     @Override
@@ -45,5 +61,4 @@ public class ApplicationUserDetails implements UserDetails{
 
     @Override
     public boolean isEnabled() { return true; }
-
 }

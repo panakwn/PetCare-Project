@@ -16,13 +16,14 @@
         </div>
         <div class="card-body">
 
-          <form th:action="@{/appointments/new}" th:object="${scheduleAppointmentRequest}" method="post">
+          <form th:action="@{/appointments/new}" th:object="${scheduleAppointmentRequest}" method="post" id="appointmentForm">
 
             <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger">
               <ul>
                 <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
               </ul>
             </div>
+
             <div class="mb-3">
               <label for="petId" class="form-label">Επιλέξτε Κατοικίδιο</label>
               <select class="form-select" id="petId" th:field="*{petId}" required>
@@ -43,9 +44,18 @@
               </select>
             </div>
 
+            <input type="hidden" id="realDateInput" th:field="*{date}">
+
             <div class="mb-3">
-              <label for="date" class="form-label">Ημερομηνία & Ώρα</label>
-              <input type="datetime-local" class="form-control" id="date" th:field="*{date}" required>
+              <label for="datePart" class="form-label">Ημερομηνία</label>
+              <input type="date" class="form-control" id="datePart" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="timePart" class="form-label">Ώρα (08:00 - 20:00)</label>
+              <select class="form-select" id="timePart" required disabled>
+                <option value="" selected disabled>-- Επιλέξτε πρώτα Ημερομηνία --</option>
+              </select>
             </div>
             <div class="mb-3">
               <label for="description" class="form-label">Αιτία Επίσκεψης</label>
@@ -61,7 +71,130 @@
       </div>
     </div>
   </div>
-</div>
 
+  <script>
+    const vetSelect = document.getElementById('vetId');
+    const datePart = document.getElementById('datePart');
+    const timePart = document.getElementById('timePart');
+    const realDateInput = document.getElementById('realDateInput');
+    let busySlots = []; // Τα πιασμένα ραντεβού
+
+    function populateTimeSlots() {
+
+      timePart.innerHTML = '<option value="" selected disabled>-- Επιλογή Ώρας --</option>';
+
+      const startHour = 8;
+      const endHour = 20;
+
+
+      for (let hour = startHour; hour < endHour; hour++) {
+
+        let time00 = (hour < 10 ? '0' : '') + hour + ':00';
+        let option00 = document.createElement('option');
+        option00.value = time00;
+        option00.text = time00;
+        timePart.appendChild(option00);
+
+        let time30 = (hour < 10 ? '0' : '') + hour + ':30';
+        let option30 = document.createElement('option');
+        option30.value = time30;
+        option30.text = time30;
+        timePart.appendChild(option30);
+      }
+
+      let optionEnd = document.createElement('option');
+      optionEnd.value = "20:00";
+      optionEnd.text = "20:00";
+      timePart.appendChild(optionEnd);
+    }
+
+    populateTimeSlots();
+
+    window.addEventListener('load', function() {
+      const now = new Date();
+      const todayISO = now.toISOString().split('T')[0];
+      datePart.min = todayISO;
+    });
+
+    vetSelect.addEventListener('change', function() {
+      const vetId = this.value;
+      if (vetId) {
+        fetch('/api/appointments/vet/' + vetId)
+                .then(response => response.json())
+                .then(data => {
+                  busySlots = data;
+                  console.log("Busy slots loaded:", busySlots);
+                  if (datePart.value) {
+                    checkAvailability();
+                  }
+                })
+                .catch(error => console.error("Error fetching appointments:", error));
+      }
+    });
+
+    datePart.addEventListener('change', function() {
+      if (this.value) {
+        timePart.disabled = false;
+        updateRealInput();
+        checkAvailability();
+      } else {
+        timePart.disabled = true;
+        timePart.value = "";
+      }
+    });
+
+    timePart.addEventListener('change', function() {
+      updateRealInput();
+    });
+
+    function updateRealInput() {
+      if (datePart.value && timePart.value) {
+        realDateInput.value = datePart.value + 'T' + timePart.value;
+      }
+    }
+
+    function checkAvailability() {
+      if (!datePart.value || busySlots.length === 0) return;
+
+      const selectedDateStr = datePart.value;
+      const options = timePart.options;
+
+      for (let i = 0; i < options.length; i++) {
+        options[i].disabled = false;
+        if (options[i].text.includes("(Κατειλημμένο)")) {
+          options[i].text = options[i].value;
+        }
+      }
+
+      for (let i = 1; i < options.length; i++) {
+        const timeStr = options[i].value;
+
+        const slotStart = new Date(selectedDateStr + 'T' + timeStr);
+        const slotEnd = new Date(slotStart.getTime() + 30 * 60000);
+
+        let isBusy = false;
+
+        for (let busy of busySlots) {
+          const busyStart = new Date(busy.start);
+          const busyEnd = new Date(busy.end);
+
+          if (slotStart < busyEnd && slotEnd > busyStart) {
+            isBusy = true;
+            break;
+          }
+        }
+
+        if (isBusy) {
+          options[i].disabled = true;
+          options[i].text = timeStr + " (Κατειλημμένο)";
+          if (timePart.value === timeStr) {
+            timePart.value = "";
+            alert("Η ώρα που επιλέξατε μόλις δεσμεύτηκε. Παρακαλώ επιλέξτε άλλη.");
+          }
+        }
+      }
+    }
+  </script>
+</div>
 </body>
 </html>

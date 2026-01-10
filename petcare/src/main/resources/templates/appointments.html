@@ -4,46 +4,132 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{base}">
 <head>
-    <title>Τα Ραντεβού μου</title>
+    <title>Appointments</title>
 </head>
 <body>
 
 <div layout:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Λίστα Ραντεβού</h2>
-        <a th:href="@{/appointments/new}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Νέο Ραντεβού
-        </a>
+    <h2 class="mb-4">📅 My Appointments</h2>
+
+    <div th:if="${#lists.isEmpty(appointments)}" class="alert alert-info">
+        No upcoming appointments found.
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Ημερομηνία</th>
-                <th>Κατοικίδιο</th>
-                <th>Κτηνίατρος</th>
-                <th>Αιτία</th>
-                <th>Κατάσταση</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="app : ${appointments}">
-                <td th:text="${app.id}">1</td>
-                <td th:text="${#temporals.format(app.date, 'dd-MM-yyyy HH:mm')}">12-01-2026 10:00</td>
-                <td th:text="${app.pet.name}">Max</td>
-                <td th:text="${'Dr. ' + app.vet.lastName}">Dr. House</td>
-                <td th:text="${app.description}">Εμβόλιο</td>
-                <td>
-                    <span class="badge bg-info text-dark" th:text="${app.status}">SCHEDULED</span>
-                </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(appointments)}">
-                <td colspan="6" class="text-center text-muted">Δεν υπάρχουν προγραμματισμένα ραντεβού.</td>
-            </tr>
-            </tbody>
-        </table>
+    <table class="table table-striped table-hover align-middle" th:if="${!#lists.isEmpty(appointments)}">
+        <thead class="table-dark">
+        <tr>
+            <th>Date & Time</th>
+            <th>Pet (Click for Info)</th>
+            <th th:if="${isVet}">Owner</th>
+            <th th:unless="${isVet}">Vet</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th th:if="${isVet}">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="app : ${appointments}">
+            <td th:text="${#temporals.format(app.date, 'dd-MM-yyyy HH:mm')}"></td>
+
+            <td>
+                <a href="#" class="text-decoration-none fw-bold text-primary"
+                   data-bs-toggle="modal"
+                   th:data-bs-target="'#petModal-' + ${app.id}">
+                    <i class="bi bi-info-circle"></i> <span th:text="${app.pet.name}"></span>
+                </a>
+
+                <div class="modal fade" th:id="'petModal-' + ${app.id}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title">
+                                    🐾 Στοιχεία: <span th:text="${app.pet.name}"></span>
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="text-center mb-3">
+                                    <h1 th:if="${app.pet.species == 'DOG'}" class="display-1">🐕</h1>
+                                    <h1 th:if="${app.pet.species == 'CAT'}" class="display-1">🐈</h1>
+                                    <h1 th:if="${app.pet.species != 'DOG' and app.pet.species != 'CAT'}" class="display-1">🐾</h1>
+                                </div>
+                                <ul class="list-group list-group-flush mb-3">
+                                    <li class="list-group-item"><strong>Είδος:</strong> <span th:text="${app.pet.species}"></span></li>
+                                    <li class="list-group-item"><strong>Ράτσα:</strong> <span th:text="${app.pet.breed}"></span></li>
+                                    <li class="list-group-item"><strong>Ηλικία:</strong> <span th:text="${app.pet.age}"></span> ετών</li>
+                                    <li class="list-group-item text-muted">
+                                        <small>Ιδιοκτήτης: <span th:text="${app.pet.owner.firstName + ' ' + app.pet.owner.lastName}"></span></small>
+                                    </li>
+                                </ul>
+
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title"><i class="bi bi-journal-medical"></i> Ιατρικό Ιστορικό / Σημειώσεις</h6>
+
+                                        <form th:if="${isVet}" th:action="@{/pets/{id}/notes(id=${app.pet.id})}" method="post">
+                                            <div class="mb-2">
+                                                <textarea class="form-control" name="notes" rows="3"
+                                                          th:text="${app.pet.vetNotes}"
+                                                          placeholder="Γράψτε σημειώσεις για το κατοικίδιο..."></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-sm w-100">Αποθήκευση Σημειώσεων</button>
+                                        </form>
+
+                                        <p th:unless="${isVet}" class="card-text text-muted fst-italic">
+                                            <span th:if="${app.pet.vetNotes == null or app.pet.vetNotes == ''}">Δεν υπάρχουν σημειώσεις ακόμα.</span>
+                                            <span th:text="${app.pet.vetNotes}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+
+            <td th:if="${isVet}" th:text="${app.pet.owner.lastName + ' ' + app.pet.owner.firstName}"></td>
+            <td th:unless="${isVet}" th:text="${'Dr. ' + app.vet.lastName}"></td>
+            <td th:text="${app.description}"></td>
+
+            <td>
+                <span th:if="${app.status == 'SCHEDULED'}" class="badge bg-primary">Scheduled</span>
+                <span th:if="${app.status == 'COMPLETED'}" class="badge bg-success">Completed</span>
+                <span th:if="${app.status == 'CANCELLED'}" class="badge bg-danger">Cancelled</span>
+            </td>
+
+            <td th:if="${isVet}">
+                <div th:if="${app.status == 'SCHEDULED'}" class="d-flex gap-2">
+
+                    <form th:if="${app.startTime != null and app.startTime.isBefore(#temporals.createNow())}"
+                          th:action="@{/appointments/{id}/complete(id=${app.id})}"
+                          method="post">
+                        <button type="submit" class="btn btn-success btn-sm" title="Ολοκλήρωση Ραντεβού">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    </form>
+
+                    <form th:action="@{/appointments/{id}/cancel(id=${app.id})}"
+                          method="post"
+                          onsubmit="return confirm('Είστε σίγουροι ότι θέλετε να ακυρώσετε αυτό το ραντεβού;');">
+                        <button type="submit" class="btn btn-danger btn-sm" title="Ακύρωση Ραντεβού">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </form>
+
+                    <span th:if="${app.startTime != null and app.startTime.isAfter(#temporals.createNow())}"
+                          class="text-muted small align-self-center">
+                          Wait
+                    </span>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="mt-3" th:unless="${isVet}">
+        <a th:href="@{/appointments/new}" class="btn btn-primary">Schedule New Appointment</a>
     </div>
 </div>
 

@@ -13,10 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/appointments")
@@ -39,11 +37,14 @@ public class AppointmentController {
         User currentUser = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        LocalDateTime now = LocalDateTime.now();
+
         if (currentUser.getUserType() == UserType.VETERINARIAN) {
-            model.addAttribute("appointments", appointmentRepository.findAllByVetId(currentUser.getId()));
+            model.addAttribute("appointments", appointmentRepository.findActiveByVetId(currentUser.getId(), now));
+            model.addAttribute("isVet", true);
         } else {
-            // --- ΔΙΟΡΘΩΣΗ ΕΔΩ: Κλήση της νέας μεθόδου ---
-            model.addAttribute("appointments", appointmentRepository.findAllByPetOwnerId(currentUser.getId()));
+            model.addAttribute("appointments", appointmentRepository.findActiveByPetOwnerId(currentUser.getId(), now));
+            model.addAttribute("isVet", false);
         }
 
         return "appointments";
@@ -67,7 +68,6 @@ public class AppointmentController {
                                       Model model,
                                       @AuthenticationPrincipal UserDetails userDetails) {
 
-        // Θυμήσου: Εδώ είχαμε βάλει το findByUsernameWithPets για το LazyInitializationException
         User currentUser = userRepository.findByUsernameWithPets(userDetails.getUsername()).orElseThrow();
 
         if (bindingResult.hasErrors()) {
@@ -87,6 +87,18 @@ public class AppointmentController {
             return "appointment_new";
         }
 
+        return "redirect:/appointments";
+    }
+
+    @PostMapping("/{id}/complete")
+    public String completeAppointment(@PathVariable Long id) {
+        appointmentService.completeAppointment(id);
+        return "redirect:/appointments";
+    }
+
+    @PostMapping("/{id}/cancel")
+    public String cancelAppointment(@PathVariable Long id) {
+        appointmentService.cancelAppointment(id);
         return "redirect:/appointments";
     }
 }
