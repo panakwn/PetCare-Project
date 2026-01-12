@@ -16,6 +16,9 @@ import gr.hua.dit.petcare.core.service.model.CreateUserRequest;
 import jakarta.validation.Valid;
 
 @Controller
+/**
+ * UI controller for login and registration pages.
+ */
 public class AuthController {
 
     private final UserService userService;

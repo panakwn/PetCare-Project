@@ -21,6 +21,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/pets")
 public class PetController {
 
+    /**
+     * UI controller for pet pages.
+     * Manages creating, listing and deleting pets via web views.
+     */
+
     private final PetBusinessLogicService petService;
     private final UserRepository userRepository;
 

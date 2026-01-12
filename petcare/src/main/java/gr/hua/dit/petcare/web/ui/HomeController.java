@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
+    /**
+     * Home page controller. Adds authenticated user info to the model for the home view.
+     */
+
     @GetMapping("/")
     public String home(Authentication authentication, Model model) {
         if (authentication == null || !authentication.isAuthenticated()) {

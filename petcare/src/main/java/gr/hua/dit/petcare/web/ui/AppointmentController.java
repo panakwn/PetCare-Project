@@ -20,6 +20,11 @@ import java.time.LocalDateTime;
 @RequestMapping("/appointments")
 public class AppointmentController {
 
+    /**
+     * UI controller for appointment pages.
+     * Handles listing, scheduling and updating appointment state via web views.
+     */
+
     private final AppointmentBusinessLogicService appointmentService;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;

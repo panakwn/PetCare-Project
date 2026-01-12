@@ -31,6 +31,10 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/pets")
 @Tag(name = "Pets", description = "API for managing pets")
 @SecurityRequirement(name = "bearer-key")
+/**
+ * REST endpoints for pet management.
+ * Allows owners to list, create and delete their pets.
+ */
 public class PetRestController {
 
     private final PetBusinessLogicService petService;

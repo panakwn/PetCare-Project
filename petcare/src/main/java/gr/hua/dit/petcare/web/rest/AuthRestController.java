@@ -19,6 +19,9 @@ import gr.hua.dit.petcare.web.rest.model.LoginResponse;
 
 @RestController
 @RequestMapping("/api/auth")
+/**
+ * Authentication REST endpoints for login and user registration.
+ */
 public class AuthRestController {
 
     private final AuthenticationManager authenticationManager;

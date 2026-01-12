@@ -20,6 +20,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/users")
 @Tag(name = "Users", description = "API for retrieving user information (e.g. Vets)")
 @SecurityRequirement(name = "bearer-key")
+/**
+ * Endpoints to retrieve users information, such as registered veterinarians.
+ */
 public class UserRestController {
 
     private final UserRepository userRepository;

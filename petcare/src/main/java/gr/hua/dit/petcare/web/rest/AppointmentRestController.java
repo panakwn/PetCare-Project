@@ -28,6 +28,10 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/appointments")
 @Tag(name = "Appointments", description = "API for managing appointments")
 @SecurityRequirement(name = "bearer-key")
+/**
+ * REST endpoints for managing appointments.
+ * Provides listing, scheduling, cancelling and completing operations.
+ */
 public class AppointmentRestController {
 
     private final AppointmentBusinessLogicService appointmentService;
