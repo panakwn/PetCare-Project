@@ -10,9 +10,11 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
+// Configuration for OpenAPI documentation with Swagger/SpringDoc
 @Configuration
 public class OpenApiConfig {
 
+    // Creates OpenAPI specification with JWT security configuration
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
@@ -31,6 +33,7 @@ public class OpenApiConfig {
             .addSecurityItem(new SecurityRequirement().addList("BearerAuth"));
     }
 
+    // Registers OpenAPI endpoints for REST API documentation
     @Bean
     public GroupedOpenApi groupedOpenApi() {
         return GroupedOpenApi.builder()

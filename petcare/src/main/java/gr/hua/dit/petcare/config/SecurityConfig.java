@@ -25,27 +25,24 @@ public class SecurityConfig {
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
-    // --- ΠΡΟΣΘΗΚΗ: ΑΥΤΟ ΕΛΕΙΠΕ ΚΑΙ ΧΤΥΠΟΥΣΕ ΤΟ ΛΑΘΟΣ ---
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-    // ----------------------------------------------------
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 1. API Chain: Για το REST API (Stateless με JWT)
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
             .securityMatcher("/api/**")
-            .csrf(csrf -> csrf.disable()) // Απενεργοποίηση CSRF για το API
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Endpoint για login/token
+                .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -54,7 +51,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 2. UI Chain: Για το Thymeleaf (Stateful με Cookies)
     @Bean
     @Order(2)
     public SecurityFilterChain uiFilterChain(HttpSecurity http) throws Exception {

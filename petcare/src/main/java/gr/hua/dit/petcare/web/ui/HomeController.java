@@ -19,7 +19,7 @@ public class HomeController {
 
         model.addAttribute("username", userDetails.getUsername());
         model.addAttribute("firstName", userDetails.getUser().getFirstName());
-        model.addAttribute("userType", userDetails.getUser().getUserType().name()); // PET_OWNER ή VETERINARIAN
+        model.addAttribute("userType", userDetails.getUser().getUserType().name());
 
         return "home";
     }

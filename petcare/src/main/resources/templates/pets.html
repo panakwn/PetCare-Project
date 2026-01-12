@@ -36,7 +36,7 @@
 
                         <li class="mt-3" th:if="${pet.vetNotes != null and pet.vetNotes != ''}">
                             <div class="alert alert-warning py-2">
-                                <strong><i class="bi bi-journal-medical"></i> Σημειώσεις Κτηνιάτρου:</strong><br>
+                                <strong><i class="bi bi-journal-medical"></i> Veterinary Notes:</strong><br>
                                 <small th:text="${pet.vetNotes}"></small>
                             </div>
                         </li>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="card-footer bg-transparent border-top-0 d-flex justify-content-center pb-3">
                     <form th:action="@{/pets/delete/{id}(id=${pet.id})}" method="post"
-                          onsubmit="return confirm('Είστε σίγουροι; Θα διαγραφούν και όλα τα ραντεβού του κατοικιδίου.');">
+                          onsubmit="return confirm('Are you sure? All appointments for this pet will also be deleted.');">
                         <button type="submit" class="btn btn-outline-danger btn-sm">
                             <i class="bi bi-trash"></i> Delete
                         </button>

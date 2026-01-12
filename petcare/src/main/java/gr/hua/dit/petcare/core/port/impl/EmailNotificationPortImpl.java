@@ -31,7 +31,6 @@ public class EmailNotificationPortImpl implements EmailNotificationPort {
         request.put("userId", "1"); 
 
         try {
-            // Κλήση POST στο εξωτερικό API
             Object response = restTemplate.postForObject(emailProviderUrl, request, Object.class);
             
             System.out.println("Email notification sent via external API. Response: " + response);

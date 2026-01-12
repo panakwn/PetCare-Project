@@ -16,7 +16,6 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    // Στην πραγματικότητα, αυτό το κλειδί θα έπρεπε να βρίσκεται σε περιβάλλον παραγωγής (π.χ. application.yml)
     private final String SECRET = "your-very-secure-and-very-long-secret-key-for-petcare-project";
     private final SecretKey KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 

@@ -52,7 +52,6 @@ public class Pet {
     private List<Appointment> appointments;
 
 
-    // --- ΝΕΟ ΠΕΔΙΟ: Σημειώσεις Κτηνιάτρου ---
     @Column(length = 2000)
     private String vetNotes;
 
@@ -76,7 +75,6 @@ public class Pet {
     public void setAppointments(List<Appointment> appointments) { this.appointments = appointments; }
 
 
-    // Getters & Setters για vetNotes
     public String getVetNotes() { return vetNotes; }
     public void setVetNotes(String vetNotes) { this.vetNotes = vetNotes; }
 }

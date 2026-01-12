@@ -18,21 +18,16 @@ import gr.hua.dit.petcare.core.model.Appointment;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
 
-    // --- ΤΑ ΠΑΛΙΑ (κρατάμε μόνο τα active/pending) ---
-
-    // Για τον Κτηνίατρο: Φέρε αυτά που (Τελειώνουν στο μέλλον) Ή (Είναι ακόμη SCHEDULED)
     @Query("SELECT a FROM Appointment a WHERE a.vet.id = :vetId AND (a.endTime > :now OR a.status = 'SCHEDULED') ORDER BY a.startTime ASC")
     List<Appointment> findActiveByVetId(@Param("vetId") Long vetId, @Param("now") LocalDateTime now);
 
 
-    // Για τον Ιδιοκτήτη: Φέρε αυτά που (Τελειώνουν στο μέλλον) Ή (Είναι ακόμη SCHEDULED)
     @Query("SELECT a FROM Appointment a WHERE a.pet.owner.id = :ownerId AND (a.endTime > :now OR a.status = 'SCHEDULED') ORDER BY a.startTime ASC")
     List<Appointment> findActiveByPetOwnerId(@Param("ownerId") Long ownerId, @Param("now") LocalDateTime now);
 
 
-    // ... οι υπόλοιπες μέθοδοι που είχαμε (existsOverlappingAppointment κλπ) ...
     List<Appointment> findAllByVetId(Long vetId);
-    List<Appointment> findAllByPetOwnerId(Long ownerId); // Ήταν findAllByPetOwnerId που φτιάξαμε πριν
+    List<Appointment> findAllByPetOwnerId(Long ownerId);
 
     boolean existsByPetIdAndDateBetween(Long petId, LocalDateTime start, LocalDateTime end);
 

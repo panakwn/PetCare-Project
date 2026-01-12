@@ -14,7 +14,7 @@ public record CreatePetRequest(
     String name,
 
     @NotBlank(message = "Enter animal type")
-    String animalType, // π.χ. DOG, CAT
+    String animalType,
 
     @Size(max = 50)
     String breed, 

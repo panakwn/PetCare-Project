@@ -43,7 +43,7 @@
                         <div class="modal-content">
                             <div class="modal-header bg-info text-white">
                                 <h5 class="modal-title">
-                                    🐾 Στοιχεία: <span th:text="${app.pet.name}"></span>
+                                    🐾 Details: <span th:text="${app.pet.name}"></span>
                                 </h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
@@ -54,36 +54,36 @@
                                     <h1 th:if="${app.pet.species != 'DOG' and app.pet.species != 'CAT'}" class="display-1">🐾</h1>
                                 </div>
                                 <ul class="list-group list-group-flush mb-3">
-                                    <li class="list-group-item"><strong>Είδος:</strong> <span th:text="${app.pet.species}"></span></li>
-                                    <li class="list-group-item"><strong>Ράτσα:</strong> <span th:text="${app.pet.breed}"></span></li>
-                                    <li class="list-group-item"><strong>Ηλικία:</strong> <span th:text="${app.pet.age}"></span> ετών</li>
+                                    <li class="list-group-item"><strong>Species:</strong> <span th:text="${app.pet.species}"></span></li>
+                                    <li class="list-group-item"><strong>Breed:</strong> <span th:text="${app.pet.breed}"></span></li>
+                                    <li class="list-group-item"><strong>Age:</strong> <span th:text="${app.pet.age}"></span> years</li>
                                     <li class="list-group-item text-muted">
-                                        <small>Ιδιοκτήτης: <span th:text="${app.pet.owner.firstName + ' ' + app.pet.owner.lastName}"></span></small>
+                                        <small>Owner: <span th:text="${app.pet.owner.firstName + ' ' + app.pet.owner.lastName}"></span></small>
                                     </li>
                                 </ul>
 
                                 <div class="card bg-light">
                                     <div class="card-body">
-                                        <h6 class="card-title"><i class="bi bi-journal-medical"></i> Ιατρικό Ιστορικό / Σημειώσεις</h6>
+                                        <h6 class="card-title"><i class="bi bi-journal-medical"></i> Medical History / Notes</h6>
 
                                         <form th:if="${isVet}" th:action="@{/pets/{id}/notes(id=${app.pet.id})}" method="post">
                                             <div class="mb-2">
                                                 <textarea class="form-control" name="notes" rows="3"
                                                           th:text="${app.pet.vetNotes}"
-                                                          placeholder="Γράψτε σημειώσεις για το κατοικίδιο..."></textarea>
+                                                          placeholder="Write notes for the pet..."></textarea>
                                             </div>
-                                            <button type="submit" class="btn btn-primary btn-sm w-100">Αποθήκευση Σημειώσεων</button>
+                                            <button type="submit" class="btn btn-primary btn-sm w-100">Save Notes</button>
                                         </form>
 
                                         <p th:unless="${isVet}" class="card-text text-muted fst-italic">
-                                            <span th:if="${app.pet.vetNotes == null or app.pet.vetNotes == ''}">Δεν υπάρχουν σημειώσεις ακόμα.</span>
+                                            <span th:if="${app.pet.vetNotes == null or app.pet.vetNotes == ''}">No notes available yet.</span>
                                             <span th:text="${app.pet.vetNotes}"></span>
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -106,15 +106,15 @@
                     <form th:if="${app.startTime != null and app.startTime.isBefore(#temporals.createNow())}"
                           th:action="@{/appointments/{id}/complete(id=${app.id})}"
                           method="post">
-                        <button type="submit" class="btn btn-success btn-sm" title="Ολοκλήρωση Ραντεβού">
+                        <button type="submit" class="btn btn-success btn-sm" title="Complete Appointment">
                             <i class="bi bi-check-lg"></i>
                         </button>
                     </form>
 
                     <form th:action="@{/appointments/{id}/cancel(id=${app.id})}"
                           method="post"
-                          onsubmit="return confirm('Είστε σίγουροι ότι θέλετε να ακυρώσετε αυτό το ραντεβού;');">
-                        <button type="submit" class="btn btn-danger btn-sm" title="Ακύρωση Ραντεβού">
+                          onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                        <button type="submit" class="btn btn-danger btn-sm" title="Cancel Appointment">
                             <i class="bi bi-x-lg"></i>
                         </button>
                     </form>

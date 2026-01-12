@@ -54,7 +54,7 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
         );
 
         if (conflictExists) {
-            throw new RuntimeException("Δεν επιτρέπεται νέο ραντεβού. Πρέπει να υπάρχει κενό 2 ημερών από προηγούμενο ή επόμενο ραντεβού για το ίδιο κατοικίδιο.");
+            throw new RuntimeException("New appointment not allowed. There must be a gap of 2 days from a previous or next appointment for the same pet.");
         }
 
         LocalDateTime newAppointmentStart = request.getDate();
@@ -67,7 +67,7 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
         );
 
         if (isVetBusy) {
-            throw new RuntimeException("Ο κτηνίατρος δεν είναι διαθέσιμος την επιλεγμένη ώρα (" + newAppointmentStart + " - " + newAppointmentEnd + "). Παρακαλώ επιλέξτε άλλη ώρα.");
+            throw new RuntimeException("The veterinarian is not available at the selected time (" + newAppointmentStart + " - " + newAppointmentEnd + "). Please select another time.");
         }
 
         Appointment appointment = new Appointment();
@@ -83,8 +83,8 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
 
         emailPort.sendEmail(
                 owner.getEmail(),
-                "Επιβεβαίωση Ραντεβού",
-                "Γεια σας " + owner.getFirstName() + ", το ραντεβού για το κατοικίδιό σας (" + pet.getName() + ") καταχωρήθηκε επιτυχώς!"
+                "Appointment Confirmation",
+                "Hello " + owner.getFirstName() + ", the appointment for your pet (" + pet.getName() + ") has been successfully registered!"
         );
 
         return "Appointment created successfully with ID: " + appointment.getId();

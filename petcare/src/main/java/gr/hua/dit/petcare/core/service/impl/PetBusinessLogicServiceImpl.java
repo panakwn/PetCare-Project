@@ -50,7 +50,7 @@ public class PetBusinessLogicServiceImpl implements PetBusinessLogicService {
                 .orElseThrow(() -> new RuntimeException("Pet not found with id: " + petId));
 
         if (!pet.getOwner().getUsername().equals(username)) {
-            throw new RuntimeException("Δεν έχετε δικαίωμα να διαγράψετε αυτό το κατοικίδιο!");
+            throw new RuntimeException("You do not have permission to delete this pet!");
         }
 
         petRepository.delete(pet);

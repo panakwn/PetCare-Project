@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-// Repository for accessing Pet data in the database
 @Repository
 public interface PetRepository extends JpaRepository<Pet, Long> {
 

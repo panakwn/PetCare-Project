@@ -4,7 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{base}">
 <head>
-  <title>Κλείσιμο Ραντεβού</title>
+  <title>Book Appointment</title>
 </head>
 <body>
 <div layout:fragment="content">
@@ -12,7 +12,7 @@
     <div class="col-md-6">
       <div class="card">
         <div class="card-header bg-success text-white">
-          <h4 class="mb-0">Νέο Ραντεβού</h4>
+          <h4 class="mb-0">New Appointment</h4>
         </div>
         <div class="card-body">
 
@@ -25,9 +25,9 @@
             </div>
 
             <div class="mb-3">
-              <label for="petId" class="form-label">Επιλέξτε Κατοικίδιο</label>
+              <label for="petId" class="form-label">Select Pet</label>
               <select class="form-select" id="petId" th:field="*{petId}" required>
-                <option value="" disabled selected>-- Επιλογή --</option>
+                <option value="" disabled selected>-- Select --</option>
                 <option th:each="pet : ${pets}"
                         th:value="${pet.id}"
                         th:text="${pet.name}"></option>
@@ -35,9 +35,9 @@
             </div>
 
             <div class="mb-3">
-              <label for="vetId" class="form-label">Επιλέξτε Κτηνίατρο</label>
+              <label for="vetId" class="form-label">Select Veterinarian</label>
               <select class="form-select" id="vetId" th:field="*{vetId}" required>
-                <option value="" disabled selected>-- Επιλογή --</option>
+                <option value="" disabled selected>-- Select --</option>
                 <option th:each="vet : ${vets}"
                         th:value="${vet.id}"
                         th:text="${'Dr. ' + vet.firstName + ' ' + vet.lastName}"></option>
@@ -47,24 +47,24 @@
             <input type="hidden" id="realDateInput" th:field="*{date}">
 
             <div class="mb-3">
-              <label for="datePart" class="form-label">Ημερομηνία</label>
+              <label for="datePart" class="form-label">Date</label>
               <input type="date" class="form-control" id="datePart" required>
             </div>
 
             <div class="mb-3">
-              <label for="timePart" class="form-label">Ώρα (08:00 - 20:00)</label>
+              <label for="timePart" class="form-label">Time (08:00 - 20:00)</label>
               <select class="form-select" id="timePart" required disabled>
-                <option value="" selected disabled>-- Επιλέξτε πρώτα Ημερομηνία --</option>
+                <option value="" selected disabled>-- Select Date First --</option>
               </select>
             </div>
             <div class="mb-3">
-              <label for="description" class="form-label">Αιτία Επίσκεψης</label>
-              <textarea class="form-control" id="description" th:field="*{description}" rows="3" placeholder="π.χ. Ετήσιος εμβολιασμός"></textarea>
+              <label for="description" class="form-label">Reason for Visit</label>
+              <textarea class="form-control" id="description" th:field="*{description}" rows="3" placeholder="E.g., Annual vaccination"></textarea>
             </div>
 
             <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-success">Κράτηση Ραντεβού</button>
-              <a th:href="@{/appointments}" class="btn btn-secondary">Ακύρωση</a>
+              <button type="submit" class="btn btn-success">Book Appointment</button>
+              <a th:href="@{/appointments}" class="btn btn-secondary">Cancel</a>
             </div>
           </form>
         </div>
@@ -77,11 +77,11 @@
     const datePart = document.getElementById('datePart');
     const timePart = document.getElementById('timePart');
     const realDateInput = document.getElementById('realDateInput');
-    let busySlots = []; // Τα πιασμένα ραντεβού
+    let busySlots = []; // Booked appointment slots
 
     function populateTimeSlots() {
 
-      timePart.innerHTML = '<option value="" selected disabled>-- Επιλογή Ώρας --</option>';
+      timePart.innerHTML = '<option value="" selected disabled>-- Select Time --</option>';
 
       const startHour = 8;
       const endHour = 20;
@@ -161,7 +161,7 @@
 
       for (let i = 0; i < options.length; i++) {
         options[i].disabled = false;
-        if (options[i].text.includes("(Κατειλημμένο)")) {
+        if (options[i].text.includes("(Booked)")) {
           options[i].text = options[i].value;
         }
       }
@@ -186,10 +186,10 @@
 
         if (isBusy) {
           options[i].disabled = true;
-          options[i].text = timeStr + " (Κατειλημμένο)";
+          options[i].text = timeStr + " (Booked)";
           if (timePart.value === timeStr) {
             timePart.value = "";
-            alert("Η ώρα που επιλέξατε μόλις δεσμεύτηκε. Παρακαλώ επιλέξτε άλλη.");
+            alert("The time slot you selected is now booked. Please select another time.");
           }
         }
       }
