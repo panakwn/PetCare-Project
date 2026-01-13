@@ -13,6 +13,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+// Service for creating and validating JWT tokens
 @Service
 public class JwtService {
 
@@ -28,6 +29,7 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    // Creates a new JWT token with 10-hour expiration for authenticated user
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
@@ -37,6 +39,7 @@ public class JwtService {
                 .compact();
     }
 
+    // Validates token signature and expiration against user details
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);

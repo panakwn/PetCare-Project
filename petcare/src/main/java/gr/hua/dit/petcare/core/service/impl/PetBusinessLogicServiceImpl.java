@@ -11,6 +11,7 @@ import gr.hua.dit.petcare.core.repository.UserRepository;
 import gr.hua.dit.petcare.core.service.PetBusinessLogicService;
 import gr.hua.dit.petcare.core.service.model.CreatePetRequest;
 
+// Business logic for pet registration and management
 @Service
 @Transactional
 public class PetBusinessLogicServiceImpl implements PetBusinessLogicService {
@@ -23,6 +24,7 @@ public class PetBusinessLogicServiceImpl implements PetBusinessLogicService {
         this.userRepository = userRepository;
     }
 
+    // Registers a new pet with calculated age from birth date
     @Override
     public void createPet(CreatePetRequest request, String ownerUsername) {
         User owner = userRepository.findByUsername(ownerUsername)
@@ -44,6 +46,7 @@ public class PetBusinessLogicServiceImpl implements PetBusinessLogicService {
         petRepository.save(pet);
     }
 
+    // Deletes pet after verifying ownership permissions
     @Override
     public void deletePet(Long petId, String username) {
         Pet pet = petRepository.findById(petId)
@@ -56,6 +59,7 @@ public class PetBusinessLogicServiceImpl implements PetBusinessLogicService {
         petRepository.delete(pet);
     }
 
+    // Updates veterinary notes for a pet
     @Override
     public void updateVetNotes(Long petId, String notes) {
         Pet pet = petRepository.findById(petId)

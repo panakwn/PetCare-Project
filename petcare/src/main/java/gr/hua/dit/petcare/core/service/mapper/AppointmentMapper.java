@@ -4,6 +4,7 @@ import gr.hua.dit.petcare.core.model.Appointment;
 import gr.hua.dit.petcare.core.service.model.AppointmentView;
 import org.springframework.stereotype.Component;
 
+// Maps Appointment entity to AppointmentView DTO
 @Component
 public class AppointmentMapper {
 

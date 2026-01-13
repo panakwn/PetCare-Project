@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+// Request DTO for pet registration with validation rules
 public record CreatePetRequest(
     @NotBlank(message = "Enter a name")
     @Size(max = 50)

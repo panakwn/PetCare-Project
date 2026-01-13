@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import gr.hua.dit.petcare.core.port.EmailNotificationPort;
 
+// Implementation of email notification service using external API
 @Service
 public class EmailNotificationPortImpl implements EmailNotificationPort {
 
@@ -22,6 +23,7 @@ public class EmailNotificationPortImpl implements EmailNotificationPort {
         this.emailProviderUrl = emailProviderUrl;
     }
 
+    // Sends email via external email provider API
     @Override
     public String sendEmail(String to, String subject, String body) {
         Map<String, String> request = new HashMap<>();

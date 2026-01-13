@@ -4,6 +4,7 @@ import gr.hua.dit.petcare.core.service.model.CreatePetRequest;
 import gr.hua.dit.petcare.core.service.model.PetView; 
 import java.util.List;
 
+// Service for pet registration and retrieval operations
 public interface PetService {
 
     PetView createPet(Long ownerId, CreatePetRequest request);

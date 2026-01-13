@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+// Request DTO for user registration with validation constraints
 public record CreateUserRequest(
     @NotNull @NotBlank @Size(max = 50) String username,
     @NotNull @NotBlank @Size(max = 100) @Email String email,

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
+// Business logic for appointment scheduling and management with validation
 @Service
 @Transactional
 public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessLogicService {
@@ -32,6 +33,7 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
         this.emailPort = emailPort;
     }
 
+    // Validates availability and creates appointment with email notification to owner
     @Override
     public String scheduleAppointment(ScheduleAppointmentRequest request) {
         Pet pet = petRepository.findById(request.getPetId())
@@ -90,6 +92,7 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
         return "Appointment created successfully with ID: " + appointment.getId();
     }
 
+    // Marks appointment as completed
     @Override
     public void completeAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -99,6 +102,7 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
         appointmentRepository.save(appointment);
     }
 
+    // Marks appointment as cancelled
     @Override
     public void cancelAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)

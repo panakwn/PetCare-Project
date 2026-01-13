@@ -4,6 +4,7 @@ import gr.hua.dit.petcare.core.service.model.AppointmentView;
 import gr.hua.dit.petcare.core.service.model.ScheduleAppointmentRequest; 
 import java.util.List;
 
+// Service for appointment scheduling and retrieval operations
 public interface AppointmentService {
     
     AppointmentView scheduleAppointment(Long ownerId, ScheduleAppointmentRequest request);

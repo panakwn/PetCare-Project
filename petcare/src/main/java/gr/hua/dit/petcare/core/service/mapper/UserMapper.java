@@ -4,6 +4,7 @@ import gr.hua.dit.petcare.core.model.User;
 import gr.hua.dit.petcare.core.service.model.UserView;
 import org.springframework.stereotype.Component;
 
+// Maps User entity to UserView DTO
 @Component
 public class UserMapper {
 

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Service for user registration and retrieval operations
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Registers new user with encrypted password and validates uniqueness
     @Override
     public UserView registerOwner(final CreateUserRequest createUserRequest) {
         if (createUserRequest == null) throw new IllegalArgumentException("Request cannot be null");
@@ -67,6 +69,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toView(user);
     }
 
+    // Retrieves all users with veterinarian role
     @Override
     public List<UserView> findAllVets() {
         return userRepository.findByUserType(UserType.VETERINARIAN)

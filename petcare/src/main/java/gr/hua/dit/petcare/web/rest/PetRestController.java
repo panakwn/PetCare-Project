@@ -1,21 +1,5 @@
 package gr.hua.dit.petcare.web.rest;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import gr.hua.dit.petcare.core.model.User;
 import gr.hua.dit.petcare.core.repository.UserRepository;
 import gr.hua.dit.petcare.core.service.PetBusinessLogicService;
@@ -26,15 +10,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+// REST controller for pet management endpoints
 @RestController
 @RequestMapping("/api/pets")
 @Tag(name = "Pets", description = "API for managing pets")
-@SecurityRequirement(name = "bearer-key")
-/**
- * REST endpoints for pet management.
- * Allows owners to list, create and delete their pets.
- */
+@SecurityRequirement(name = "bearer-key") // Required so JWT auth works in Swagger UI
 public class PetRestController {
 
     private final PetBusinessLogicService petService;
@@ -49,7 +38,8 @@ public class PetRestController {
         this.petMapper = petMapper;
     }
 
-    @Operation(summary = "Pet List", description = "Returns the pets of the logged-in user")
+    // Returns pets for the authenticated user
+    @Operation(summary = "List Pets", description = "Returns pets of the authenticated user")
     @GetMapping
     public ResponseEntity<List<PetView>> getMyPets(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername())
@@ -62,25 +52,28 @@ public class PetRestController {
         return ResponseEntity.ok(pets);
     }
 
-    @Operation(summary = "Create Pet", description = "Adds a new pet to the user")
+    // Creates a pet for the current user
+    @Operation(summary = "Create Pet", description = "Adds a new pet for the authenticated user")
     @PostMapping
-    @Secured("ROLE_OWNER")
+    @Secured("ROLE_PET_OWNER")
     public ResponseEntity<String> createPet(@Valid @RequestBody CreatePetRequest request,
                                             @AuthenticationPrincipal UserDetails userDetails) {
         petService.createPet(request, userDetails.getUsername());
         return ResponseEntity.ok("Pet created successfully!");
     }
 
+    // Deletes a pet owned by the current user
     @Operation(summary = "Delete Pet", description = "Deletes a pet (and its appointments) by ID")
     @DeleteMapping("/{id}")
-    @Secured("ROLE_OWNER")
+    @Secured("ROLE_PET_OWNER")
     public ResponseEntity<String> deletePet(@PathVariable Long id,
                                             @AuthenticationPrincipal UserDetails userDetails) {
         petService.deletePet(id, userDetails.getUsername());
         return ResponseEntity.ok("Pet deleted successfully!");
     }
 
-    @Operation(summary = "Update Veterinary Notes", description = "Updates the medical notes of a pet (Only for Veterinarians)")
+    // Updates veterinary notes for a pet (vets only)
+    @Operation(summary = "Update Vet Notes", description = "Updates veterinary notes for a pet (Veterinarians only)")
     @PostMapping("/{id}/notes")
     @Secured("ROLE_VETERINARIAN")
     public ResponseEntity<String> updateVetNotes(@PathVariable Long id,

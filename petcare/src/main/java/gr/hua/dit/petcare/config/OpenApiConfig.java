@@ -10,35 +10,37 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
-// Configuration for OpenAPI documentation with Swagger/SpringDoc
+// OpenAPI configuration with JWT bearer security
 @Configuration
 public class OpenApiConfig {
 
-    // Creates OpenAPI specification with JWT security configuration
+    // Builds the OpenAPI spec and registers JWT bearer security
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
             .info(new Info()
                 .title("PetCare API")
                 .version("v1")
-                .description("API for the petcare")
+                .description("API for the petcare application")
             )
             .components(new Components()
-                .addSecuritySchemes("BearerAuth", new SecurityScheme()
+                // Scheme name must remain "bearer-key" to match controller @SecurityRequirement
+                .addSecuritySchemes("bearer-key", new SecurityScheme()
                     .type(SecurityScheme.Type.HTTP)
                     .scheme("bearer")
                     .bearerFormat("JWT")
                 )
             )
-            .addSecurityItem(new SecurityRequirement().addList("BearerAuth"));
+            // Apply the bearer-key requirement globally to all endpoints
+            .addSecurityItem(new SecurityRequirement().addList("bearer-key"));
     }
 
-    // Registers OpenAPI endpoints for REST API documentation
+    // Groups REST endpoints under /api/** for documentation
     @Bean
     public GroupedOpenApi groupedOpenApi() {
         return GroupedOpenApi.builder()
             .group("api")
-            .packagesToScan("gr.hua.dit.petcare.web.rest") 
+            .packagesToScan("gr.hua.dit.petcare.web.rest")
             .pathsToMatch("/api/**")
             .build();
     }

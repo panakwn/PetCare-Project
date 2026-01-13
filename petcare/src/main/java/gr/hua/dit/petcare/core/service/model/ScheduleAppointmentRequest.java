@@ -7,20 +7,21 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+// Request DTO for scheduling appointments with validation rules
 public class ScheduleAppointmentRequest {
 
-    @NotNull(message = "Πρέπει να επιλέξετε κατοικίδιο")
+    @NotNull(message = "You must select a pet")
     private Long petId;
 
-    @NotNull(message = "Πρέπει να επιλέξετε κτηνίατρο")
+    @NotNull(message = "You must select a veterinarian")
     private Long vetId;
 
-    @NotNull(message = "Η ημερομηνία είναι υποχρεωτική")
-    @Future(message = "Το ραντεβού πρέπει να είναι σε μελλοντική ημερομηνία")
+    @NotNull(message = "Date is required")
+    @Future(message = "Appointment must be scheduled for a future date")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime date;
 
-    @Size(max = 255, message = "Η περιγραφή δεν μπορεί να ξεπερνά τους 255 χαρακτήρες")
+    @Size(max = 255, message = "Description cannot exceed 255 characters")
     private String description;
 
     public ScheduleAppointmentRequest() {

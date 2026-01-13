@@ -4,6 +4,7 @@ import gr.hua.dit.petcare.core.model.Pet;
 import gr.hua.dit.petcare.core.service.model.PetView;
 import org.springframework.stereotype.Component;
 
+// Maps Pet entity to PetView DTO
 @Component
 public class PetMapper {
 

@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import gr.hua.dit.petcare.core.model.User;
 
+// Wrapper for User entity implementing Spring Security UserDetails interface
 public class ApplicationUserDetails implements UserDetails {
 
     private final User user;
@@ -15,6 +16,7 @@ public class ApplicationUserDetails implements UserDetails {
         this.user = user;
     }
 
+    // Returns the wrapped User entity
     public User getUser() {
         return user;
     }

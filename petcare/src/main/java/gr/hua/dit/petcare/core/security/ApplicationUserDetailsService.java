@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import gr.hua.dit.petcare.core.model.User;
 import gr.hua.dit.petcare.core.repository.UserRepository;
 
+// Loads user details from database for Spring Security authentication
 @Service
 public class ApplicationUserDetailsService implements UserDetailsService {
 
