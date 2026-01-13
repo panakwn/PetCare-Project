@@ -36,7 +36,6 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/appointments")
 @Tag(name = "Appointments", description = "API for managing appointments")
 @SecurityRequirement(name = "bearer-key")
-// REST controller for appointment management endpoints
 public class AppointmentRestController {
 
     private final AppointmentBusinessLogicService appointmentService;
@@ -57,13 +56,11 @@ public class AppointmentRestController {
     @GetMapping
     @Operation(summary = "List my appointments", description = "Returns a list of appointments relevant to the current user (Vet or Owner)")
     public List<AppointmentView> getAppointments(@AuthenticationPrincipal UserDetails userDetails) {
-        // Find logged-in user
         User currentUser = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         List<Appointment> appointments;
 
-        // Fetch appointments based on user role
         if (currentUser.getUserType() == UserType.VETERINARIAN) {
             appointments = appointmentRepository.findByVet(currentUser);
         } else {
@@ -77,20 +74,22 @@ public class AppointmentRestController {
 
     @PostMapping
     @Operation(summary = "Schedule a new appointment", description = "Creates a new appointment and notifies the owner")
-    @Secured("ROLE_PET_OWNER") // Only pet owners can schedule
-    public ResponseEntity<Map<String, String>> createAppointment(@Valid @RequestBody ScheduleAppointmentRequest request) {
-        String result = appointmentService.scheduleAppointment(request);
+    @Secured("ROLE_PET_OWNER")
+    public ResponseEntity<Map<String, String>> createAppointment(@Valid @RequestBody ScheduleAppointmentRequest request,
+                                                                 @AuthenticationPrincipal UserDetails userDetails) { // <--- Προσθήκη userDetails
+       
+        // Περνάμε το username στο Service για έλεγχο
+        String result = appointmentService.scheduleAppointment(request, userDetails.getUsername());
+       
         return ResponseEntity.ok(Collections.singletonMap("message", result));
     }
 
     @PostMapping("/{id}/cancel")
     @Operation(summary = "Cancel an appointment", description = "Cancels an existing appointment (Must be the assigned Vet)")
     @Secured("ROLE_VETERINARIAN")
-    public ResponseEntity<String> cancelAppointment(@PathVariable Long id, 
+    public ResponseEntity<String> cancelAppointment(@PathVariable Long id,
                                                     @AuthenticationPrincipal UserDetails userDetails) {
-        // Verify current user is the assigned vet
         checkAppointmentOwnership(id, userDetails.getUsername());
-
         appointmentService.cancelAppointment(id);
         return ResponseEntity.ok("Appointment cancelled successfully!");
     }
@@ -100,19 +99,15 @@ public class AppointmentRestController {
     @Secured("ROLE_VETERINARIAN")
     public ResponseEntity<String> completeAppointment(@PathVariable Long id,
                                                       @AuthenticationPrincipal UserDetails userDetails) {
-        // Verify current user is the assigned vet
         checkAppointmentOwnership(id, userDetails.getUsername());
-
         appointmentService.completeAppointment(id);
         return ResponseEntity.ok("Appointment completed successfully!");
     }
 
-    // Helper method to verify vet ownership of appointment
     private void checkAppointmentOwnership(Long appointmentId, String username) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found"));
 
-        // Throw exception if user is not the assigned vet
         if (!appointment.getVet().getUsername().equals(username)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: You are not assigned to this appointment.");
         }

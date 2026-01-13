@@ -73,7 +73,11 @@ public class AppointmentController {
                                       Model model,
                                       @AuthenticationPrincipal UserDetails userDetails) {
 
-        User currentUser = userRepository.findByUsernameWithPets(userDetails.getUsername()).orElseThrow();
+
+        // Χρησιμοποιούμε το userDetails.getUsername() για να βρούμε τον χρήστη
+        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+                 .orElseThrow(() -> new RuntimeException("User not found"));
+
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("pets", currentUser.getPets());
@@ -82,7 +86,8 @@ public class AppointmentController {
         }
 
         try {
-            appointmentService.scheduleAppointment(request);
+            // ΔΙΟΡΘΩΣΗ: Περνάμε ΚΑΙ το username στη μέθοδο
+            appointmentService.scheduleAppointment(request, userDetails.getUsername());
         } catch (RuntimeException e) {
             bindingResult.addError(new ObjectError("scheduleAppointmentRequest", e.getMessage()));
 

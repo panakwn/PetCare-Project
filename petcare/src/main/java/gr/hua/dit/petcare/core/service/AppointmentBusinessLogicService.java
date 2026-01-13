@@ -2,9 +2,8 @@ package gr.hua.dit.petcare.core.service;
 
 import gr.hua.dit.petcare.core.service.model.ScheduleAppointmentRequest;
 
-// Business logic operations for appointment lifecycle management
 public interface AppointmentBusinessLogicService {
-    String scheduleAppointment(ScheduleAppointmentRequest request);
+    String scheduleAppointment(ScheduleAppointmentRequest request, String username);
     void completeAppointment(Long appointmentId);
     void cancelAppointment(Long appointmentId);
 }
