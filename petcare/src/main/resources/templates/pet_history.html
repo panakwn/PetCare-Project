@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pet History</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>
+            <i class="bi bi-clock-history"></i> History for:
+            <span th:text="${pet.name}" class="fw-bold text-primary"></span>
+        </h3>
+        <a th:href="@{/pets}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Pets
+        </a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(appointments)}" class="alert alert-info">
+        No appointment history found for this pet.
+    </div>
+
+    <div class="table-responsive" th:if="${!#lists.isEmpty(appointments)}">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>Date & Time</th>
+                <th>Veterinarian</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Notes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="app : ${appointments}">
+                <td th:text="${#temporals.format(app.date, 'dd-MM-yyyy HH:mm')}"></td>
+                <td th:text="${'Dr. ' + app.vet.lastName + ' ' + app.vet.firstName}"></td>
+                <td th:text="${app.description}"></td>
+                <td>
+                    <span th:if="${app.status == 'SCHEDULED'}" class="badge bg-primary">Scheduled</span>
+                    <span th:if="${app.status == 'COMPLETED'}" class="badge bg-success">Completed</span>
+                    <span th:if="${app.status == 'CANCELLED'}" class="badge bg-danger">Cancelled</span>
+                </td>
+                <td>
+                    <small th:if="${app.status == 'COMPLETED'}" th:text="${app.pet.vetNotes}"></small>
+                    <small th:unless="${app.status == 'COMPLETED'}" class="text-muted">-</small>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

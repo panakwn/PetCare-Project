@@ -12,6 +12,7 @@ import gr.hua.dit.petcare.core.service.model.ScheduleAppointmentRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -33,7 +34,7 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
     }
 
     @Override
-    public String scheduleAppointment(ScheduleAppointmentRequest request, String username) { // <--- Νέα παράμετρος
+    public String scheduleAppointment(ScheduleAppointmentRequest request, String username) {
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new RuntimeException("Pet not found with id: " + request.getPetId()));
 
@@ -42,7 +43,6 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
             throw new RuntimeException("Owner not found for this pet");
         }
 
-        // --- SECURITY CHECK: Ανήκει το ζώο στον χρήστη που καλεί το API; ---
         if (!owner.getUsername().equals(username)) {
             throw new RuntimeException("Δεν επιτρέπεται να κλείσετε ραντεβού για κατοικίδιο που δεν σας ανήκει!");
         }
@@ -86,7 +86,6 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
 
         appointmentRepository.save(appointment);
 
-        // Χρήση του Mock REST Client για ειδοποίηση
         emailPort.sendNotification(
                 owner.getEmail(),
                 "Appointment Confirmation",
@@ -112,5 +111,17 @@ public class AppointmentBusinessLogicServiceImpl implements AppointmentBusinessL
 
         appointment.setStatus("CANCELLED");
         appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public List<Appointment> getPetHistory(Long petId, String username) {
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new RuntimeException("Pet not found"));
+
+        if (!pet.getOwner().getUsername().equals(username)) {
+            throw new RuntimeException("Access denied: This is not your pet.");
+        }
+
+        return appointmentRepository.findAllByPetIdOrderByDateDesc(petId);
     }
 }

@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import gr.hua.dit.petcare.core.model.Pet;
 import gr.hua.dit.petcare.core.model.User;
+import gr.hua.dit.petcare.core.repository.PetRepository;
 import gr.hua.dit.petcare.core.repository.UserRepository;
+import gr.hua.dit.petcare.core.service.AppointmentBusinessLogicService;
 import gr.hua.dit.petcare.core.service.PetBusinessLogicService;
 import gr.hua.dit.petcare.core.service.model.CreatePetRequest;
 import jakarta.validation.Valid;
@@ -21,17 +25,19 @@ import jakarta.validation.Valid;
 @RequestMapping("/pets")
 public class PetController {
 
-    /**
-     * UI controller for pet pages.
-     * Manages creating, listing and deleting pets via web views.
-     */
-
     private final PetBusinessLogicService petService;
+    private final AppointmentBusinessLogicService appointmentService; // Inject AppointmentService
     private final UserRepository userRepository;
+    private final PetRepository petRepository;
 
-    public PetController(PetBusinessLogicService petService, UserRepository userRepository) {
+    public PetController(PetBusinessLogicService petService,
+                         AppointmentBusinessLogicService appointmentService,
+                         UserRepository userRepository,
+                         PetRepository petRepository) {
         this.petService = petService;
+        this.appointmentService = appointmentService;
         this.userRepository = userRepository;
+        this.petRepository = petRepository;
     }
 
     @GetMapping
@@ -69,5 +75,23 @@ public class PetController {
     public String updateVetNotes(@PathVariable Long id, @RequestParam("notes") String notes) {
         petService.updateVetNotes(id, notes);
         return "redirect:/appointments";
+    }
+
+    @GetMapping("/{id}/history")
+    public String viewPetHistory(@PathVariable Long id,
+                                 Model model,
+                                 @AuthenticationPrincipal UserDetails userDetails) {
+
+        Pet pet = petRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pet not found"));
+
+        if (!pet.getOwner().getUsername().equals(userDetails.getUsername())) {
+            return "redirect:/pets";
+        }
+
+        model.addAttribute("pet", pet);
+        model.addAttribute("appointments", appointmentService.getPetHistory(id, userDetails.getUsername()));
+
+        return "pet_history";
     }
 }

@@ -21,8 +21,8 @@
         <div class="col" th:each="pet : ${pets}">
             <div class="card h-100 shadow-sm">
                 <div class="card-header text-center bg-light">
-                    <h1 th:if="${pet.species == 'DOG'}">🐕</h1>
-                    <h1 th:if="${pet.species == 'CAT'}">🐈</h1>
+                    <h1 th:if="${pet.species == 'DOG'}">🐶</h1>
+                    <h1 th:if="${pet.species == 'CAT'}">🐱</h1>
                     <h1 th:if="${pet.species != 'DOG' and pet.species != 'CAT'}">🐾</h1>
                 </div>
                 <div class="card-body">
@@ -43,13 +43,19 @@
                         </li>
                     </ul>
                 </div>
-                <div class="card-footer bg-transparent border-top-0 d-flex justify-content-center pb-3">
-                    <form th:action="@{/pets/delete/{id}(id=${pet.id})}" method="post"
-                          onsubmit="return confirm('Are you sure? All appointments for this pet will also be deleted.');">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-trash"></i> Delete
-                        </button>
-                    </form>
+                <div class="card-footer bg-transparent border-top-0 pb-3">
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/pets/{id}/history(id=${pet.id})}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-clock-history"></i> History
+                        </a>
+
+                        <form th:action="@{/pets/delete/{id}(id=${pet.id})}" method="post"
+                              onsubmit="return confirm('Are you sure? All appointments for this pet will also be deleted.');">
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
