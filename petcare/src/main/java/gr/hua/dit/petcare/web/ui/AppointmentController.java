@@ -57,7 +57,7 @@ public class AppointmentController {
 
     @GetMapping("/new")
     public String showScheduleForm(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+        User currentUser = userRepository.findByUsernameWithPets(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         model.addAttribute("pets", currentUser.getPets());
@@ -73,10 +73,8 @@ public class AppointmentController {
                                       Model model,
                                       @AuthenticationPrincipal UserDetails userDetails) {
 
-
-        // Χρησιμοποιούμε το userDetails.getUsername() για να βρούμε τον χρήστη
-        User currentUser = userRepository.findByUsername(userDetails.getUsername())
-                 .orElseThrow(() -> new RuntimeException("User not found"));
+        User currentUser = userRepository.findByUsernameWithPets(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
 
         if (bindingResult.hasErrors()) {
@@ -86,7 +84,6 @@ public class AppointmentController {
         }
 
         try {
-            // ΔΙΟΡΘΩΣΗ: Περνάμε ΚΑΙ το username στη μέθοδο
             appointmentService.scheduleAppointment(request, userDetails.getUsername());
         } catch (RuntimeException e) {
             bindingResult.addError(new ObjectError("scheduleAppointmentRequest", e.getMessage()));
